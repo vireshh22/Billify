@@ -1,7 +1,11 @@
 package com.billify.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.billify.entity.Bill;
 import com.billify.service.BillService;
+import com.billify.service.PDFService;
 
 
 @RestController
@@ -23,6 +28,9 @@ public class BillController {
 
     @Autowired
     private BillService billService;
+
+    @Autowired
+    private PDFService pdfService;
 
     // Getting all bills
     @GetMapping("/bills")
@@ -32,6 +40,13 @@ public class BillController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.of(Optional.of(bills));
+    }
+
+    public ResponseEntity<byte[]> downloadBill() throws IOException{
+        Date date = new Date();
+        String billNo = UUID.randomUUID().toString();
+        ByteArrayInputStream bis = pdfService.generateBill(billNo, date.toString());
+        return null;
     }
 
     // Getting a single bill by ID
