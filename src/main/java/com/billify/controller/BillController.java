@@ -2,6 +2,7 @@ package com.billify.controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import org.springframework.http.HttpHeaders;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.billify.entity.Bill;
 import com.billify.service.BillService;
 import com.billify.service.PDFService;
-
 
 @RestController
 public class BillController {
@@ -42,11 +43,17 @@ public class BillController {
         return ResponseEntity.of(Optional.of(bills));
     }
 
-    public ResponseEntity<byte[]> downloadBill() throws IOException{
+    public ResponseEntity<byte[]> downloadBill() throws IOException {
         Date date = new Date();
         String billNo = UUID.randomUUID().toString();
         ByteArrayInputStream bis = pdfService.generateBill(billNo, date.toString());
-        return null;
+        byte[] billBytes = bis.readAllBytes();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename=Viresh_Hiremath.pdf");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(billBytes);
     }
 
     // Getting a single bill by ID
