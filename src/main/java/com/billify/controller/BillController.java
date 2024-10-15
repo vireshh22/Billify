@@ -43,6 +43,7 @@ public class BillController {
         return ResponseEntity.of(Optional.of(bills));
     }
 
+    @GetMapping("/download")
     public ResponseEntity<byte[]> downloadBill() throws IOException {
         Date date = new Date();
         String billNo = UUID.randomUUID().toString();
