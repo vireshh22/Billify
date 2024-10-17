@@ -42,14 +42,14 @@ public class PDFServiceImpl implements PDFService {
             // Header - Title and Company Information
             PdfPTable headerTable = new PdfPTable(2);
             headerTable.setWidthPercentage(100);
-            PdfPCell titleCell = new PdfPCell(new Paragraph("TAX INVOICE", headerFont));
+            PdfPCell titleCell = new PdfPCell(new Paragraph("Viresh's Bill", headerFont));
             titleCell.setBorder(Rectangle.NO_BORDER);
             titleCell.setHorizontalAlignment(Element.ALIGN_LEFT);
             headerTable.addCell(titleCell);
 
             // Company information in the right corner
             PdfPCell companyInfoCell = new PdfPCell(new Paragraph(
-                "Medical Invoice\nAddress: Church Street Bengaluru\nPhone: +91-1075314648 +91-8029924749", regularFont));
+                "Bill No:1234\nMedical Invoice\nAddress: Church Street Bengaluru\nPhone: +91-1234567890 +91-1234567890", regularFont));
             companyInfoCell.setBorder(Rectangle.NO_BORDER);
             companyInfoCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             headerTable.addCell(companyInfoCell);
@@ -58,7 +58,7 @@ public class PDFServiceImpl implements PDFService {
             doc.add(new Paragraph("\n"));
 
             // Party Details (Name, Address, GSTIN No.)
-            doc.add(new Paragraph("Party's Name", boldFont));
+            doc.add(new Paragraph("Patient Details", boldFont));
             doc.add(new Paragraph("Name: John Doe", regularFont));
             doc.add(new Paragraph("Address: 123 Street, City, State, Zip", regularFont));
             doc.add(new Paragraph("GSTIN NO: 27ABCDE1234FZ1", regularFont));
