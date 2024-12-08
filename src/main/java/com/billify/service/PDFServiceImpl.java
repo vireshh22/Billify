@@ -21,12 +21,25 @@ public class PDFServiceImpl implements PDFService {
 
     @Override
     public ByteArrayInputStream generateBill(String billNo, String genDate) {
-        // Sample items data with [S.No, Item Name, HSN, Rate, MRP, Tax, Amount]
+        // Patient and invoice details
+        String patientName = "Balaji Alle";
+        String patientNo = "157";
+        String admissionDate = "3/10/24";
+        String dischargeDate = "31/10/24";
+        double totalAmount = 900;
+
+        // Items data
         List<Object[]> items = new ArrayList<>();
-        items.add(new Object[]{1, "Sample item 243846", "3846", "xxxx", "xxxx", "xxxx", "xxxx"});
-        items.add(new Object[]{2, "Sample item 937539", "9796", "xxxx", "xxxx", "xxxx", "xxxx"});
-        items.add(new Object[]{3, "Sample item 425695", "5672", "xxxx", "xxxx", "xxxx", "xxxx"});
-        
+        items.add(new Object[] { 1, "RL 500ml", 1, 64, 64 });
+        items.add(new Object[] { 2, "5ml sy.", 1, 20, 20 });
+        items.add(new Object[] { 3, "5cc IP", 1, 20, 20 });
+        items.add(new Object[] { 4, "IV set", 1, 200, 200 });
+        items.add(new Object[] { 5, "multivitam Inj.", 2, 50, 100 });
+        items.add(new Object[] { 6, "NT (120ml)", 1, 40, 40 });
+        items.add(new Object[] { 7, "OPD(1)", 1, 150, 150 });
+        items.add(new Object[] { 8, "OPD(2)", 1, 120, 120 });
+        items.add(new Object[] { 9, "IPD", 1, 300, 300 });
+
         Document doc = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -34,89 +47,127 @@ public class PDFServiceImpl implements PDFService {
             PdfWriter.getInstance(doc, out);
             doc.open();
 
-            // Set font styles
-            Font headerFont = new Font(Font.HELVETICA, 16, Font.BOLD);
+            Font headerFont = new Font(Font.HELVETICA, 14, Font.BOLD);
+            Font subHeaderFont = new Font(Font.HELVETICA, 12, Font.BOLD);
             Font boldFont = new Font(Font.HELVETICA, 12, Font.BOLD);
             Font regularFont = new Font(Font.HELVETICA, 10, Font.NORMAL);
-            
-            // Header - Title and Company Information
-            PdfPTable headerTable = new PdfPTable(2);
-            headerTable.setWidthPercentage(100);
-            PdfPCell titleCell = new PdfPCell(new Paragraph("Viresh's Bill", headerFont));
-            titleCell.setBorder(Rectangle.NO_BORDER);
-            titleCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-            headerTable.addCell(titleCell);
 
-            // Company information in the right corner
-            PdfPCell companyInfoCell = new PdfPCell(new Paragraph(
-                "Bill No:1234\nMedical Invoice\nAddress: Church Street Bengaluru\nPhone: +91-1234567890 +91-1234567890", regularFont));
-            companyInfoCell.setBorder(Rectangle.NO_BORDER);
-            companyInfoCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            headerTable.addCell(companyInfoCell);
+            // Header
+            PdfPTable headerTable = new PdfPTable(3);
+            headerTable.setWidthPercentage(100);
+            headerTable.setWidths(new float[] { 2, 6, 2 });
+
+            PdfPCell regCell = new PdfPCell(new Paragraph("Reg. No: 98684", regularFont));
+            regCell.setBorder(Rectangle.NO_BORDER);
+            regCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            headerTable.addCell(regCell);
+
+            PdfPCell clinicCell = new PdfPCell(new Paragraph("Harsh Clinic", headerFont));
+            clinicCell.setBorder(Rectangle.NO_BORDER);
+            clinicCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            headerTable.addCell(clinicCell);
+
+            PdfPCell phoneCell = new PdfPCell(new Paragraph("Phone: 9860840343", regularFont));
+            phoneCell.setBorder(Rectangle.NO_BORDER);
+            phoneCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            headerTable.addCell(phoneCell);
             doc.add(headerTable);
 
+            // Add doctor's details
+            Paragraph doctorName = new Paragraph("Dr. Vanita Vasant Myakal", subHeaderFont);
+            doctorName.setAlignment(Element.ALIGN_CENTER);
+            doc.add(doctorName);
+
+            Paragraph doctorProfession = new Paragraph("M.B.B.S., M.D. (Community Medicine)", regularFont);
+            doctorProfession.setAlignment(Element.ALIGN_CENTER);
+            doc.add(doctorProfession);
+
             doc.add(new Paragraph("\n"));
 
-            // Party Details (Name, Address, GSTIN No.)
-            doc.add(new Paragraph("Patient Details", boldFont));
-            doc.add(new Paragraph("Name: John Doe", regularFont));
-            doc.add(new Paragraph("Address: 123 Street, City, State, Zip", regularFont));
-            doc.add(new Paragraph("GSTIN NO: 27ABCDE1234FZ1", regularFont));
-            
+            // Invoice details
+            PdfPTable invoiceTable = new PdfPTable(3);
+            invoiceTable.setWidthPercentage(100);
+            invoiceTable.setWidths(new float[] { 3, 3, 3 });
+
+            PdfPCell billNoCell = new PdfPCell(new Paragraph("Bill No: " + "016", regularFont));
+            billNoCell.setBorder(Rectangle.NO_BORDER);
+            billNoCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            invoiceTable.addCell(billNoCell);
+
+            PdfPCell invoiceTitleCell = new PdfPCell(new Paragraph("Invoice", headerFont));
+            invoiceTitleCell.setBorder(Rectangle.NO_BORDER);
+            invoiceTitleCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            invoiceTable.addCell(invoiceTitleCell);
+
+            PdfPCell dateCell = new PdfPCell(new Paragraph("Date: " + "03/11/2024", regularFont));
+            dateCell.setBorder(Rectangle.NO_BORDER);
+            dateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            invoiceTable.addCell(dateCell);
+            doc.add(invoiceTable);
+
             doc.add(new Paragraph("\n"));
 
-            // Itemized Table (S.No, Items, HSN, Rate, MRP, Tax, Amount)
-            PdfPTable table = new PdfPTable(7);  // 7 columns
+            // Patient details
+            doc.add(new Paragraph("Patient Name: " + patientName, regularFont));
+            doc.add(new Paragraph("Patient No: " + patientNo, regularFont));
+            doc.add(new Paragraph("Admission Date: " + admissionDate, regularFont));
+            doc.add(new Paragraph("Discharge Date: " + dischargeDate, regularFont));
+            doc.add(new Paragraph("\n"));
+
+            // Table for items
+            PdfPTable table = new PdfPTable(5);
             table.setWidthPercentage(100);
+            table.setWidths(new float[] { 1, 4, 1, 1, 1 });
 
-            // Add table header
-            table.addCell(new PdfPCell(new Paragraph("S.No", boldFont)));
-            table.addCell(new PdfPCell(new Paragraph("Items", boldFont)));
-            table.addCell(new PdfPCell(new Paragraph("HSN", boldFont)));
-            table.addCell(new PdfPCell(new Paragraph("RATE", boldFont)));
-            table.addCell(new PdfPCell(new Paragraph("MRP", boldFont)));
-            table.addCell(new PdfPCell(new Paragraph("TAX", boldFont)));
+            table.addCell(new PdfPCell(new Paragraph("S. No", boldFont)));
+            table.addCell(new PdfPCell(new Paragraph("Particulars & Details", boldFont)));
+            table.addCell(new PdfPCell(new Paragraph("Qty", boldFont)));
+            table.addCell(new PdfPCell(new Paragraph("Rate", boldFont)));
             table.addCell(new PdfPCell(new Paragraph("Amount", boldFont)));
 
-            // Add item rows
             for (Object[] item : items) {
                 for (Object field : item) {
                     table.addCell(new PdfPCell(new Paragraph(field.toString(), regularFont)));
                 }
             }
-            
             doc.add(table);
 
-            doc.add(new Paragraph("\n"));
-
-            // Subtotal and other details
+            // Total Section
             PdfPTable totalTable = new PdfPTable(2);
             totalTable.setWidthPercentage(100);
+            totalTable.setWidths(new float[] { 9, 1 });
 
-            PdfPCell subtotalLabel = new PdfPCell(new Paragraph("Sub Total", boldFont));
-            subtotalLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
-            subtotalLabel.setBorder(Rectangle.NO_BORDER);
-            totalTable.addCell(subtotalLabel);
-            totalTable.addCell(new PdfPCell(new Paragraph("xxxx", regularFont)));  // Placeholder for subtotal
+            PdfPCell totalLabelCell = new PdfPCell(new Paragraph("Total:", boldFont));
+            totalLabelCell.setBorder(Rectangle.NO_BORDER);
+            totalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalLabelCell.setPaddingRight(20); // Reduce gap
+            totalTable.addCell(totalLabelCell);
 
+            PdfPCell totalValueCell = new PdfPCell(new Paragraph(String.valueOf(totalAmount), boldFont));
+            totalValueCell.setBorder(Rectangle.NO_BORDER);
+            totalValueCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            totalTable.addCell(totalValueCell);
             doc.add(totalTable);
 
-            // Amount in words and terms
-            doc.add(new Paragraph("Amount in words: Five Hundred Thirty Dollars", regularFont));
             doc.add(new Paragraph("\n"));
-            doc.add(new Paragraph("Terms and Conditions", boldFont));
-            doc.add(new Paragraph("1. Goods once sold will not be taken back.", regularFont));
-            doc.add(new Paragraph("2. Payment due within 30 days.", regularFont));
-            
-            // Seal and signature
-            PdfPTable sealTable = new PdfPTable(1);
-            sealTable.setWidthPercentage(100);
-            PdfPCell sealCell = new PdfPCell(new Paragraph("Seal & Signature", boldFont));
-            sealCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            sealCell.setBorder(Rectangle.NO_BORDER);
-            sealTable.addCell(sealCell);
-            
-            doc.add(sealTable);
+            doc.add(new Paragraph("\n"));
+
+            // Footer Section
+            PdfPTable footerTable = new PdfPTable(2);
+            footerTable.setWidthPercentage(100);
+            footerTable.setWidths(new float[] { 1, 1 });
+
+            PdfPCell guardianSignCell = new PdfPCell(new Paragraph("Guardian / Care of Sign", regularFont));
+            guardianSignCell.setBorder(Rectangle.NO_BORDER);
+            guardianSignCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            footerTable.addCell(guardianSignCell);
+
+            PdfPCell adminSignCell = new PdfPCell(new Paragraph("Signature for Admin", regularFont));
+            adminSignCell.setBorder(Rectangle.NO_BORDER);
+            adminSignCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            footerTable.addCell(adminSignCell);
+
+            doc.add(footerTable);
 
         } catch (DocumentException e) {
             e.printStackTrace();
@@ -126,4 +177,5 @@ public class PDFServiceImpl implements PDFService {
 
         return new ByteArrayInputStream(out.toByteArray());
     }
+
 }
